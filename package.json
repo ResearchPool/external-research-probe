@@ -1,0 +1,14 @@
+{
+  "name": "@researchpool/sse-research",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "SSE microservice for research announcement",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "packageManager": "pnpm@10.33.0"
+}
