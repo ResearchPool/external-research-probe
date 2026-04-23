@@ -19,6 +19,6 @@ export default function EsConnectionStatusDisplay({ esState }: EsConnectionStatu
         2: { contents: <XMarkIcon className="h-4 w-4 animate-pulse" />, parentClasses: ['bg-orange-700', 'text-white'] },
     };
     return (
-        esState && <div className={cn("rounded-t-md bg-gray-200 p-2", connectionStatusDisplay[esState].parentClasses)}>{connectionStatusDisplay[esState].contents}</div>
+        null !== esState && <div className={cn("rounded-t-md bg-gray-200 p-2", connectionStatusDisplay[esState].parentClasses)}>{connectionStatusDisplay[esState].contents}</div>
     );
 }

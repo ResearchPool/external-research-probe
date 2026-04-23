@@ -1,7 +1,3 @@
-// Monkey patching iconv encoding to accept utf8mb3
-import encodings from "iconv-lite/encodings/index.js";
-(encodings as any).utf8mb3 = (encodings as any).utf8;
-
 import { z } from "zod";
 import "dotenv/config";
 import express from "express";
@@ -27,10 +23,7 @@ const MAX_CLIENTS = 3;
 const MAX_BUFFERED_BYTES = 128 * 1024;
 
 const env = EnvSchema.parse(process.env);
-let offset: BinlogOffset = {
-    filename: "mariadb-bin.000001",
-    position: 4
-};
+let offset: BinlogOffset | null = null;
 
 const {
     HTTP_PORT = 3000,
@@ -94,9 +87,9 @@ const binlogListener = new zongji({
 });
 
 binlogListener.on("binlog", (evt: unknown) => {
-    offset.position = (evt as any).nextPosition;
+    null !== offset && (offset.position = (evt as any).nextPosition);
 
-    if ((evt as any).getEventName?.() === "rotate") {
+    if (offset && (evt as any).getEventName?.() === "rotate") {
         offset.filename = (evt as any).binlogName;
     }
 
@@ -128,11 +121,11 @@ binlogListener.on("binlog", (evt: unknown) => {
     });
 });
 
-setInterval(async () => { await saveOffset(offset) }, 60000)
+setInterval(async () => { offset && await saveOffset(offset) }, 60000)
 
 process.on('SIGINT', async () => {
     binlogListener.stop();
-    await saveOffset(offset);
+    offset && await saveOffset(offset);
     process.exit();
 });
 
@@ -140,11 +133,15 @@ app.listen(HTTP_PORT,  async () => {
     offset = await loadOffset();
     console.log('Starting in offset', offset);
     binlogListener.start({
-        ...offset,
+        ...(offset ?? {}),
         includeEvents: ['tablemap', 'writerows', 'updaterows', 'deleterows', 'rotate'],
         includeSchema: {
             [DB_DATABASE]: ['nullobject_reports_reports']
         }
     });
+    offset ??= {
+        filename: "",
+        position: 4
+    };
     console.log("CDC SSE server running on port: " + HTTP_PORT);
 });

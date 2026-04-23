@@ -102,15 +102,12 @@ importers:
       express:
         specifier: ^5.2.1
         version: 5.2.1
-      iconv-lite:
-        specifier: ^0.7.2
-        version: 0.7.2
       zod:
         specifier: ^4.3.6
         version: 4.3.6
       zongji:
-        specifier: ^0.5.1
-        version: 0.5.1
+        specifier: github:ResearchPool/zongji
+        version: https://codeload.github.com/ResearchPool/zongji/tar.gz/eec3c0ded60e5133f2b63ee9e14e403cefeacc38
     devDependencies:
       '@types/express':
         specifier: ^5.0.6
@@ -804,12 +801,12 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
-  big-integer@1.6.47:
-    resolution: {integrity: sha512-9t9f7X3as2XGX8b52GqG6ox0GvIdM86LyIXASJnDCFhYNgt+A+MByQZ3W2PyMRZjEvG5f8TEbSPfEotVuMJnQg==}
+  big-integer@1.6.48:
+    resolution: {integrity: sha512-j51egjPa7/i+RdiRuJbPdJ2FIUYYPhvYLjzoYbcMMm62ooO6F94fETG4MTs46zPAF9Brs04OajboA/qTGuz78w==}
     engines: {node: '>=0.6'}
 
-  bignumber.js@7.2.1:
-    resolution: {integrity: sha512-S4XzBk5sMB+Rcb/LNcpzXr57VRTxgAvaAEDAl1AwRx27j00hT84O6OkteE7u8UB3NuaaygCRrEpqox4uDOrbdQ==}
+  bignumber.js@9.0.0:
+    resolution: {integrity: sha512-t/OYhhJ2SD+YGBQcjY8GzzDHEk9f3nerxjtfa6tlMXfe7frs/WozhvCNoGvpM0P3bNf3Gq5ZRMlGr5f3r4/N8A==}
 
   body-parser@2.2.2:
     resolution: {integrity: sha512-oP5VkATKlNwcgvxi0vM0p/D3n2C3EReYVX+DNYs5TjZFn/oQt2j+4sVJtSMr18pdRr8wjTcBl6LoV+FUwzPmNA==}
@@ -1143,8 +1140,8 @@ packages:
     resolution: {integrity: sha512-4FbRdAX+bSdmo4AUFuS0WNiPz8NgFt+r8ThgNWmlrjQjt1Q7ZR9+zTlce2859x4KSXrwIsaeTqDoKQmtP8pLmQ==}
     engines: {node: '>= 0.8'}
 
-  iconv-lite@0.4.24:
-    resolution: {integrity: sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==}
+  iconv-lite@0.5.1:
+    resolution: {integrity: sha512-ONHr16SQvKZNSqjQT9gy5z24Jw+uqfO02/ngBSBoqChZ+W8qXX7GPRa1RoUnzGADw8K63R1BXUMzarCVQBpY8Q==}
     engines: {node: '>=0.10.0'}
 
   iconv-lite@0.7.2:
@@ -1345,8 +1342,8 @@ packages:
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
-  mysql@2.17.1:
-    resolution: {integrity: sha512-7vMqHQ673SAk5C8fOzTG2LpPcf3bNt0oL3sFpxPEEFp1mdlDcrLK0On7z8ZYKaaHrHwNcQ/MTUz7/oobZ2OyyA==}
+  mysql@2.18.1:
+    resolution: {integrity: sha512-Bca+gk2YWmqp2Uf6k5NFEurwY/0td0cpebAucFpY/3jhrwrVGuxU2uQFCHjU19SJfje0yQvi+rVWdq78hR5lig==}
     engines: {node: '>= 0.6'}
 
   nanoid@3.3.11:
@@ -1456,8 +1453,8 @@ packages:
     resolution: {integrity: sha512-llUJLzz1zTUBrskt2pwZgLq59AemifIftw4aB7JxOqf1HY2FDaGDxgwpAPVzHU1kdWabH7FauP4i1oEeer2WCA==}
     engines: {node: '>=0.10.0'}
 
-  readable-stream@2.3.6:
-    resolution: {integrity: sha512-tQtKA9WIAhBF3+VLAseyMqZeBjW0AHJoxOtYqSUZNJxauErmLbVm2FW1y+J/YA9dUrAC39ITejlZWhVIwawkKw==}
+  readable-stream@2.3.7:
+    resolution: {integrity: sha512-Ebho8K4jIbHAxnuxi7o42OrZgF/ZTNcsZj6nRKyUmkhLFq8CHItp/fy6hQZuZmP/n3yZ9VBUbp4zz/mX8hmYPw==}
 
   resolve-from@4.0.0:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}
@@ -1697,8 +1694,9 @@ packages:
   zod@4.3.6:
     resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
-  zongji@0.5.1:
-    resolution: {integrity: sha512-KBRV2iMxMDStQcHIelJDsYrhYqH7Lp8EjwWa4z0huuL9TVY6r/m9iAo3O2slvwdfv+YjrAGjeARKVeLqNPcIWA==}
+  zongji@https://codeload.github.com/ResearchPool/zongji/tar.gz/eec3c0ded60e5133f2b63ee9e14e403cefeacc38:
+    resolution: {tarball: https://codeload.github.com/ResearchPool/zongji/tar.gz/eec3c0ded60e5133f2b63ee9e14e403cefeacc38}
+    version: 0.5.1
     engines: {node: '>= 8.0'}
 
 snapshots:
@@ -2305,9 +2303,9 @@ snapshots:
 
   baseline-browser-mapping@2.10.20: {}
 
-  big-integer@1.6.47: {}
+  big-integer@1.6.48: {}
 
-  bignumber.js@7.2.1: {}
+  bignumber.js@9.0.0: {}
 
   body-parser@2.2.2:
     dependencies:
@@ -2691,7 +2689,7 @@ snapshots:
       statuses: 2.0.2
       toidentifier: 1.0.1
 
-  iconv-lite@0.4.24:
+  iconv-lite@0.5.1:
     dependencies:
       safer-buffer: 2.1.2
 
@@ -2838,10 +2836,10 @@ snapshots:
 
   ms@2.1.3: {}
 
-  mysql@2.17.1:
+  mysql@2.18.1:
     dependencies:
-      bignumber.js: 7.2.1
-      readable-stream: 2.3.6
+      bignumber.js: 9.0.0
+      readable-stream: 2.3.7
       safe-buffer: 5.1.2
       sqlstring: 2.3.1
 
@@ -2935,7 +2933,7 @@ snapshots:
 
   react@19.2.5: {}
 
-  readable-stream@2.3.6:
+  readable-stream@2.3.7:
     dependencies:
       core-util-is: 1.0.3
       inherits: 2.0.4
@@ -3167,8 +3165,8 @@ snapshots:
 
   zod@4.3.6: {}
 
-  zongji@0.5.1:
+  zongji@https://codeload.github.com/ResearchPool/zongji/tar.gz/eec3c0ded60e5133f2b63ee9e14e403cefeacc38:
     dependencies:
-      big-integer: 1.6.47
-      iconv-lite: 0.4.24
-      mysql: 2.17.1
+      big-integer: 1.6.48
+      iconv-lite: 0.5.1
+      mysql: 2.18.1
