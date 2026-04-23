@@ -1,3 +1,7 @@
+// Monkey patching iconv encoding to accept utf8mb3
+import encodings from "iconv-lite/encodings/index.js";
+(encodings as any).utf8mb3 = (encodings as any).utf8;
+
 import { z } from "zod";
 import "dotenv/config";
 import express from "express";

@@ -102,6 +102,9 @@ importers:
       express:
         specifier: ^5.2.1
         version: 5.2.1
+      iconv-lite:
+        specifier: ^0.7.2
+        version: 0.7.2
       zod:
         specifier: ^4.3.6
         version: 4.3.6

@@ -17,6 +17,7 @@
     "@app/schemas": "workspace:*",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "iconv-lite": "^0.7.2",
     "zod": "^4.3.6",
     "zongji": "^0.5.1"
   },

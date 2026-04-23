@@ -13,10 +13,13 @@
   "license": "ISC",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     }
   },
+  "files": [
+    "dist"
+  ],
   "packageManager": "pnpm@10.33.0",
   "dependencies": {
     "zod": "^4.3.6"
