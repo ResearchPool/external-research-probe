@@ -17,6 +17,7 @@
     "@app/schemas": "workspace:*",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "mysql2": "^3.22.3",
     "zod": "^4.3.6",
     "zongji": "github:ResearchPool/zongji"
   },

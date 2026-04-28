@@ -1,28 +1,20 @@
 import { z } from "zod";
-import "dotenv/config";
 import express from "express";
 import { type Response } from "express";
 import { createRequire } from 'node:module';
-import {ResearchDataSchema} from "@app/schemas";
+import { ResearchDataSchema, ReplicationStatus } from "@app/schemas";
 import {BinlogOffset, loadOffset, saveOffset} from "./binlog-offset.js";
+import { env } from "./lib/env.js";
+import { dbPool } from "./lib/db.js";
 
 const require = createRequire(import.meta.url);
 const zongji = require("zongji");
 
-// Configuration
-
-const EnvSchema = z.object({
-    HTTP_PORT: z.coerce.number().default(3000),
-    DB_HOST: z.string(),
-    DB_USER: z.string(),
-    DB_PASSWORD: z.string(),
-    DB_DATABASE: z.string()
-});
-
 const MAX_CLIENTS = 3;
 const MAX_BUFFERED_BYTES = 128 * 1024;
+const serverId = 900000 + process.pid % 10000;
+const REPLICATION_STATUS_FETCH_INTERVAL = 30000;
 
-const env = EnvSchema.parse(process.env);
 let offset: BinlogOffset | null = null;
 
 const {
@@ -36,9 +28,58 @@ const {
 const app = express();
 const clients = new Set<Response>();
 let messageSequence = 0;
+let replicationStatusRunning : boolean = false;
 
-const broadcast = ({seq, event, data}: { seq: number, event: string, data: object}) => {
-    const message = `id: ${seq}\nevent: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+interface RowReplication {
+    Connection_name: string;
+    Slave_IO_Running: string;
+    Last_IO_Errno: number;
+    Last_IO_Error: string;
+    Slave_SQL_Running: string;
+    Last_SQL_Errno: number;
+    Last_SQL_Error: string;
+}
+
+const fetchReplicationStatus = async (): Promise<ReplicationStatus[] | void> => {
+    if(replicationStatusRunning) {
+        return;
+    }
+    replicationStatusRunning = true;
+    try {
+        const [rows] = await dbPool.query("SHOW ALL SLAVES STATUS");
+
+
+        const response = (rows as any).map((row: RowReplication) => ({
+            channel: row.Connection_name,
+            components: {
+                io: {
+                    status: "Yes" === row.Slave_IO_Running ? "Running" : "Stopped",
+                    error: 0 !== row.Last_IO_Errno ? {
+                        errorNumber: row.Last_IO_Errno,
+                        errorMessage: row.Last_IO_Error
+                    } : null
+                },
+                sql: {
+                    status: "Yes" === row.Slave_SQL_Running ? "Running" : "Stopped",
+                    error: 0 !== row.Last_SQL_Errno ? {
+                        errorNumber: row.Last_SQL_Errno,
+                        errorMessage: row.Last_SQL_Error
+                    } : null
+                }
+            }
+        }));
+        replicationStatusRunning = false;
+        return response;
+    } catch (error) {
+        console.error(error);
+    } finally {
+        replicationStatusRunning = false;
+    }
+};
+
+const broadcast = ({event, data}: { event: string, data: void | object}) => {
+    messageSequence++;
+    const message = `id: ${messageSequence}\nevent: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
     for (const client of clients) {
         if(client.writableLength > MAX_BUFFERED_BYTES) {
             client.end(': Too slow... bye-bye!');
@@ -96,7 +137,6 @@ binlogListener.on("binlog", (evt: unknown) => {
     if((evt as any).getTypeName?.() !== "WriteRows") {
         return;
     }
-    messageSequence++;
     if(clients.size <= 0) {
         return;
     }
@@ -107,7 +147,6 @@ binlogListener.on("binlog", (evt: unknown) => {
     }
     const { id, ReportUID, producer_id, producer_name, date_of_report, created_at, title } = evtParseResult.data;
     broadcast({
-        seq: messageSequence,
         event: "new",
         data: {
             id: id,
@@ -137,11 +176,19 @@ app.listen(HTTP_PORT,  async () => {
         includeEvents: ['tablemap', 'writerows', 'updaterows', 'deleterows', 'rotate'],
         includeSchema: {
             [DB_DATABASE]: ['nullobject_reports_reports']
-        }
+        },
+        serverId: serverId
     });
     offset ??= {
         filename: "",
         position: 4
     };
+    setInterval(async () => {
+        const replicationStatus = await fetchReplicationStatus();
+        broadcast({
+            event: "replication_status",
+            data: replicationStatus
+        });
+    }, REPLICATION_STATUS_FETCH_INTERVAL);
     console.log("CDC SSE server running on port: " + HTTP_PORT);
 });
