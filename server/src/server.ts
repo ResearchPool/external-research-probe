@@ -12,7 +12,7 @@ const zongji = require("zongji");
 
 const MAX_CLIENTS = 3;
 const MAX_BUFFERED_BYTES = 128 * 1024;
-const serverId = 900000 + process.pid % 10000;
+const serverId = 900000 + process.pid % 10000 + (Math.random() * 15 +1);
 const REPLICATION_STATUS_FETCH_INTERVAL = 30000;
 
 let offset: BinlogOffset | null = null;
@@ -29,6 +29,7 @@ const app = express();
 const clients = new Set<Response>();
 let messageSequence = 0;
 let replicationStatusRunning : boolean = false;
+let currentTable: string = "";
 
 interface RowReplication {
     Connection_name: string;
@@ -133,29 +134,19 @@ binlogListener.on("binlog", (evt: unknown) => {
     if (offset && (evt as any).getEventName?.() === "rotate") {
         offset.filename = (evt as any).binlogName;
     }
-
-    if((evt as any).getTypeName?.() !== "WriteRows") {
+    if((evt as any).getTypeName?.() === "TableMap") {
+        currentTable = (evt as any).tableName;
         return;
     }
+    const eventType = ((evt as any).getTypeName?.() === "UpdateRows") ? "update" : (evt as any).getTypeName?.() === "WriteRows" ? "insert" : "delete";
     if(clients.size <= 0) {
         return;
     }
-    const evtParseResult = ResearchDataSchema.safeParse((evt as any).rows[0]);
-    if(!evtParseResult.success) {
-        console.warn("Received unexpected response from binlog", z.flattenError(evtParseResult.error));
-        return;
-    }
-    const { id, ReportUID, producer_id, producer_name, date_of_report, created_at, title } = evtParseResult.data;
     broadcast({
-        event: "new",
+        event: "table_operation",
         data: {
-            id: id,
-            date: date_of_report,
-            indexedDate: created_at,
-            ReportUID: ReportUID,
-            providerId: producer_id,
-            providerName: producer_name,
-            title: title
+            tableName: currentTable,
+            operationType: eventType
         }
     });
 });
@@ -174,9 +165,6 @@ app.listen(HTTP_PORT,  async () => {
     binlogListener.start({
         ...(offset ?? {}),
         includeEvents: ['tablemap', 'writerows', 'updaterows', 'deleterows', 'rotate'],
-        includeSchema: {
-            [DB_DATABASE]: ['nullobject_reports_reports']
-        },
         serverId: serverId
     });
     offset ??= {

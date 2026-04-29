@@ -40,6 +40,11 @@ export const ReplicationStatusSchema = z.object({
     })
 });
 
+export const TableOperationSchema = z.object({
+    tableName: z.string(),
+    operationType: z.enum(["insert", "update", "delete"])
+});
+
 export const ReplicationStatusSetSchema = z.array(ReplicationStatusSchema);
 
 export type ReplicationComponentRunningStatusEnum = z.infer<typeof ReplicationComponentRunningStatusEnum>;
@@ -47,3 +52,4 @@ export type NewResearchEventData = z.infer<typeof NewResearchEventDataSchema>;
 export type ResearchData = z.infer<typeof ResearchDataSchema>;
 export type ReplicationStatus = z.infer<typeof ReplicationStatusSchema>;
 export type ReplicationStatusSet = z.infer<typeof ReplicationStatusSetSchema>;
+export type TableOperation = z.infer<typeof TableOperationSchema>;

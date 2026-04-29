@@ -14,6 +14,7 @@
     "@app/schemas": "workspace:*",
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/vite": "^4.2.2",
+    "@xyflow/react": "^12.10.2",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "react": "^19.2.5",
