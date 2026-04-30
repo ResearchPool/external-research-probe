@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { ReactFlow, type Node, type Edge } from '@xyflow/react';
+import { useMemo, useEffect } from 'react';
+import { ReactFlow, type Node, type Edge, useReactFlow } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import type { ReplicationStatusSet } from '@app/schemas';
 import StatusLabelEdge from './StatusLabelEdge.tsx';
@@ -12,11 +12,13 @@ const edgeTypes = {
   'status-edge': StatusLabelEdge,
 };
 
-type ReplicationGraphProps = {
+export type ReplicationGraphProps = {
   replicationStatus: ReplicationStatusSet;
 };
 
 export default function ReplicationGraph({ replicationStatus }: ReplicationGraphProps) {
+  const { fitView } = useReactFlow();
+
   const nodes = useMemo<Node[]>(() => {
     return [
       ...replicationStatus,
@@ -50,6 +52,15 @@ export default function ReplicationGraph({ replicationStatus }: ReplicationGraph
       },
     }));
   }, [replicationStatus]);
+
+  useEffect(() => {
+    if (nodes.length) {
+      fitView({
+        padding: 0.2,
+        duration: 300,
+      });
+    }
+  }, [nodes, edges, fitView]);
 
   return (
     <div className="h-100 w-full">

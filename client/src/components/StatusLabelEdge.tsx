@@ -32,7 +32,6 @@ export default function StatusLabelEdge({
     targetX,
     targetY,
   });
-  console.log(data);
 
   return (
     <>

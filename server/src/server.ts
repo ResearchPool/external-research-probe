@@ -13,7 +13,7 @@ import ZongJi from 'zongji';
 const MAX_CLIENTS = 20;
 const MAX_BUFFERED_BYTES = 128 * 1024;
 const serverId = 900000 + (process.pid % 10000) + (Math.random() * 15 + 1);
-const REPLICATION_STATUS_FETCH_INTERVAL = 30000;
+const REPLICATION_STATUS_FETCH_INTERVAL = 5000;
 
 const { HTTP_PORT = 3000, DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE } = env;
 

@@ -5,8 +5,8 @@ import {
   TableOperationSchema,
 } from '@app/schemas';
 import EsConnectionStatusDisplay from './components/EsConnectionStatusDisplay.tsx';
-import ReplicationGraph from './components/ReplicationGraph.tsx';
 import TableOperations from './components/TableOperations.tsx';
+import ReplicationGraphWrapper from './components/ReplicationGraphWrapper.tsx';
 
 const ACTIVITY_CHECK_INTERVAL: number = 5 * 1000;
 const ACTIVITY_TIMEOUT: number = 30 * 1000;
@@ -132,7 +132,7 @@ export default function App() {
         </div>
         <div className="pb-5">
           <h2 className="text-xl/7">Replication channels</h2>
-          <ReplicationGraph replicationStatus={replicationStatus} />
+          <ReplicationGraphWrapper replicationStatus={replicationStatus} />
         </div>
         <div className="flex gap-4 place-content-center items-end">
           <div className="bg-slate-200 rounded-t-lg pt-1 px-3 inline-flex md:gap-4 flex-col md:flex-row">
