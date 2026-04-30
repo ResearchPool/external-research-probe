@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "tsx src/server.ts",
     "build": "tsc -p tsconfig.json",
+    "format": "prettier --write .",
     "start": "node dist/index.js"
   },
   "keywords": [],
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^24.12.2",
+    "prettier": "^3.8.3",
     "tsx": "^4.21.0",
     "typescript": "~6.0.3"
   }

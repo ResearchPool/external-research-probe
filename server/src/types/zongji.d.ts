@@ -1,25 +1,25 @@
-declare module "zongji" {
-    interface ZongJiOptions {
-        host: string;
-        user: string;
-        password: string;
-        port?: number;
-        database?: string;
-    }
+declare module 'zongji' {
+  interface ZongJiOptions {
+    host: string;
+    user: string;
+    password: string;
+    port?: number;
+    database?: string;
+  }
 
-    type ZongJiEvent = any;
+  type ZongJiEvent = any;
 
-    type ZongJiCallback = (event: ZongJiEvent) => void;
+  type ZongJiCallback = (event: ZongJiEvent) => void;
 
-    class ZongJi {
-        constructor(options: ZongJiOptions);
+  class ZongJi {
+    constructor(options: ZongJiOptions);
 
-        start(options?: any): void;
-        stop(): void;
+    start(options?: any): void;
+    stop(): void;
 
-        on(event: "binlog", cb: ZongJiCallback): void;
-        on(event: "error", cb: (err: Error) => void): void;
-    }
+    on(event: 'binlog', cb: ZongJiCallback): void;
+    on(event: 'error', cb: (err: Error) => void): void;
+  }
 
-    export = ZongJi;
+  export = ZongJi;
 }

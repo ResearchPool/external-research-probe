@@ -1,13 +1,34 @@
 import { z } from "zod";
 
-export const ReplicationComponentRunningStatusEnum = z.enum(["Running", "Stopped"]);
+export enum TableOperationEnum {
+    INSERT = "insert",
+    UPDATE = "update",
+    DELETE = "delete"
+}
+
+export enum EventEnum {
+    REPLICATION_STATUS = "replication_status",
+    TABLE_OPERATION = "table_operation"
+}
+
+export enum ReplicationComponentRunningStatusEnum {
+    RUNNING = "Running",
+    STOPPED = "Stopped",
+    UNKNOWN = "Unknown"
+}
+
 export const ReplicationErrorSchema = z.object({
     errorNumber: z.number(),
     errorMessage: z.string()
 });
 
+export const TableOperationSchema = z.object({
+    tableName: z.string(),
+    operationType: z.enum(TableOperationEnum)
+});
+
 export const ReplicationComponentStatusSchema = z.object({
-    status: ReplicationComponentRunningStatusEnum,
+    status: z.enum(ReplicationComponentRunningStatusEnum),
     error: z.union([z.null(), ReplicationErrorSchema])
 });
 
@@ -40,14 +61,22 @@ export const ReplicationStatusSchema = z.object({
     })
 });
 
-export const TableOperationSchema = z.object({
-    tableName: z.string(),
-    operationType: z.enum(["insert", "update", "delete"])
-});
-
 export const ReplicationStatusSetSchema = z.array(ReplicationStatusSchema);
 
-export type ReplicationComponentRunningStatusEnum = z.infer<typeof ReplicationComponentRunningStatusEnum>;
+export const SseEventSchema = z.xor([
+    // replication_status
+    z.object({
+        event: z.literal(EventEnum.REPLICATION_STATUS),
+        data: ReplicationStatusSetSchema
+    }),
+    // table_operation
+    z.object({
+        event: z.literal(EventEnum.TABLE_OPERATION),
+        data: TableOperationSchema
+    })
+]);
+
+export type SseEvent = z.infer<typeof SseEventSchema>;
 export type NewResearchEventData = z.infer<typeof NewResearchEventDataSchema>;
 export type ResearchData = z.infer<typeof ResearchDataSchema>;
 export type ReplicationStatus = z.infer<typeof ReplicationStatusSchema>;
