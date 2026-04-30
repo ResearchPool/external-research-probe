@@ -7,14 +7,17 @@ declare module 'zongji' {
     database?: string;
   }
 
-  type ZongJiEvent = any;
+  type ZongJiEvent = {
+    getTypeName?(): string;
+    tableName: string;
+  };
 
   type ZongJiCallback = (event: ZongJiEvent) => void;
 
   class ZongJi {
     constructor(options: ZongJiOptions);
 
-    start(options?: any): void;
+    start(options?: object): void;
     stop(): void;
 
     on(event: 'binlog', cb: ZongJiCallback): void;

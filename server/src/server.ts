@@ -1,11 +1,14 @@
 import express, { type Response } from 'express';
-import { createRequire } from 'node:module';
-import { EventEnum, ReplicationStatus, type SseEvent, TableOperationEnum } from '@app/schemas';
+import {
+  EventEnum,
+  ReplicationComponentRunningStatusEnum,
+  ReplicationStatus,
+  type SseEvent,
+  TableOperationEnum,
+} from '@app/schemas';
 import { env } from './lib/env.js';
 import { dbPool } from './lib/db.js';
-
-const require = createRequire(import.meta.url);
-const zongji = require('zongji');
+import ZongJi from 'zongji';
 
 const MAX_CLIENTS = 20;
 const MAX_BUFFERED_BYTES = 128 * 1024;
@@ -38,31 +41,39 @@ const fetchReplicationStatus = async (): Promise<ReplicationStatus[]> => {
   try {
     const [rows] = await dbPool.query('SHOW ALL SLAVES STATUS');
 
-    const response = (rows as any).map((row: RowReplication) => ({
-      channel: row.Connection_name,
-      components: {
-        io: {
-          status: 'Yes' === row.Slave_IO_Running ? 'Running' : 'Stopped',
-          error:
-            0 !== row.Last_IO_Errno
-              ? {
-                  errorNumber: row.Last_IO_Errno,
-                  errorMessage: row.Last_IO_Error,
-                }
-              : null,
+    const response = (rows as Array<RowReplication>).map(
+      (row: RowReplication): ReplicationStatus => ({
+        channel: row.Connection_name,
+        components: {
+          io: {
+            status:
+              'Yes' === row.Slave_IO_Running
+                ? ReplicationComponentRunningStatusEnum.RUNNING
+                : ReplicationComponentRunningStatusEnum.STOPPED,
+            error:
+              0 !== row.Last_IO_Errno
+                ? {
+                    errorNumber: row.Last_IO_Errno,
+                    errorMessage: row.Last_IO_Error,
+                  }
+                : null,
+          },
+          sql: {
+            status:
+              'Yes' === row.Slave_SQL_Running
+                ? ReplicationComponentRunningStatusEnum.RUNNING
+                : ReplicationComponentRunningStatusEnum.STOPPED,
+            error:
+              0 !== row.Last_SQL_Errno
+                ? {
+                    errorNumber: row.Last_SQL_Errno,
+                    errorMessage: row.Last_SQL_Error,
+                  }
+                : null,
+          },
         },
-        sql: {
-          status: 'Yes' === row.Slave_SQL_Running ? 'Running' : 'Stopped',
-          error:
-            0 !== row.Last_SQL_Errno
-              ? {
-                  errorNumber: row.Last_SQL_Errno,
-                  errorMessage: row.Last_SQL_Error,
-                }
-              : null,
-        },
-      },
-    }));
+      }),
+    );
     replicationStatusRunning = false;
     return response;
   } catch (error) {
@@ -117,24 +128,28 @@ app.get('/events', (req, res) => {
   req.on('error', cleanup);
 });
 
-const binlogListener = new zongji({
+const binlogListener = new ZongJi({
   host: DB_HOST,
   user: DB_USER,
   password: DB_PASSWORD,
 });
 
-binlogListener.on('binlog', (evt: unknown) => {
+binlogListener.on('binlog', (evt) => {
   if (clients.size <= 0) {
     return;
   }
-  if ((evt as any).getTypeName?.() === 'TableMap') {
-    currentTable = (evt as any).tableName;
+  if (evt.getTypeName?.() === 'TableMap') {
+    currentTable = evt?.tableName || '';
+    return;
+  }
+  if ('' === currentTable.trim()) {
+    console.warn('Table not specified');
     return;
   }
   const eventType =
-    (evt as any).getTypeName?.() === 'UpdateRows'
+    evt.getTypeName?.() === 'UpdateRows'
       ? TableOperationEnum.UPDATE
-      : (evt as any).getTypeName?.() === 'WriteRows'
+      : evt.getTypeName?.() === 'WriteRows'
         ? TableOperationEnum.INSERT
         : TableOperationEnum.DELETE;
   broadcast({
